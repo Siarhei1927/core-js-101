@@ -188,9 +188,9 @@ function isInsideCircle(circle, point) {
  *   'abracadabra'  => 'c'
  *   'entente' => null
  */
-/* function findFirstSingleChar(str) {
-
-} */
+function findFirstSingleChar(/* str */) {
+  throw new Error('Not implemented');
+}
 
 
 /**
