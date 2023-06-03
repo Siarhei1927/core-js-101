@@ -28,10 +28,19 @@
  *      .catch((error) => console.log(error.message)) // 'Error: Wrong parameter is passed!
  *                                                    //  Ask her again.';
  */
-function willYouMarryMe(/* isPositiveAnswer */) {
-  throw new Error('Not implemented');
+function willYouMarryMe(isPositiveAnswer) {
+  return new Promise((resolve, reject) => {
+    if (typeof isPositiveAnswer === 'boolean') {
+      if (isPositiveAnswer) {
+        resolve('Hooray!!! She said "Yes"!');
+      } else {
+        resolve('Oh no, she said "No".');
+      }
+    } else {
+      reject(new Error('Wrong parameter is passed! Ask her again.'));
+    }
+  });
 }
-
 
 /**
  * Return Promise object that should be resolved with array containing plain values.
@@ -48,8 +57,11 @@ function willYouMarryMe(/* isPositiveAnswer */) {
  *    })
  *
  */
-function processAllPromises(/* array */) {
-  throw new Error('Not implemented');
+function processAllPromises(array) {
+  return Promise.all(array) // когда все промисы в массиве array будут разр. - создю новый промис
+    .then((values) => values.map((value) => (value instanceof Promise ? undefined : value)));
+  /* values - массив значений из разр. промисов; Если (после map) эл.-экземпляр промиса,
+  то возвращаем undefined, иначе само значение */
 }
 
 /**
@@ -71,8 +83,27 @@ function processAllPromises(/* array */) {
  *    })
  *
  */
-function getFastestPromise(/* array */) {
-  throw new Error('Not implemented');
+function getFastestPromise(array) {
+  return new Promise((resolve, reject) => {
+    const results = []; // Для результатов успешных промисов.
+    let resolved = false;
+    let rejected = false;
+
+    array.forEach((promise) => { // Итерация по переданному массиву array
+      promise.then((result) => {
+        if (!resolved && !rejected) { // Проверка на разрешённые и откланённые промисы
+          resolved = true; // если нет
+          results.push(result);
+          resolve(results); // разрешение для передачи основного промиса
+        }
+      }).catch((error) => {
+        if (!resolved && !rejected) {
+          rejected = true;
+          reject(error); // отклонение осн промиса с ошибкой с помощью reject.
+        }
+      });
+    });
+  });
 }
 
 /**
