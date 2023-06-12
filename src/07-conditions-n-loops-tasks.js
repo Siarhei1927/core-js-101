@@ -216,8 +216,12 @@ function findFirstSingleChar(str) {
  *   5, 3, true, true   => '[3, 5]'
  *
  */
-function getIntervalString(/* a, b, isStartIncluded, isEndIncluded */) {
-  throw new Error('Not implemented');
+function getIntervalString(a, b, isStartIncluded, isEndIncluded) {
+  const startBracket = isStartIncluded ? '[' : '(';
+  const endBracket = isEndIncluded ? ']' : ')';
+  const smallerNumber = Math.min(a, b);
+  const largerNumber = Math.max(a, b);
+  return `${startBracket}${smallerNumber}, ${largerNumber}${endBracket}`;
 }
 
 
@@ -233,8 +237,8 @@ function getIntervalString(/* a, b, isStartIncluded, isEndIncluded */) {
  * 'rotator' => 'rotator'
  * 'noon' => 'noon'
  */
-function reverseString(/* str */) {
-  throw new Error('Not implemented');
+function reverseString(str) {
+  return str.split('').reverse().join('');
 }
 
 
@@ -250,8 +254,9 @@ function reverseString(/* str */) {
  *   87354 => 45378
  *   34143 => 34143
  */
-function reverseInteger(/* num */) {
-  throw new Error('Not implemented');
+function reverseInteger(num) {
+  const revStr = num.toString().split('').reverse().join('');
+  return parseInt(revStr, 10);
 }
 
 
@@ -275,8 +280,26 @@ function reverseInteger(/* num */) {
  *   5436468789016589 => false
  *   4916123456789012 => false
  */
-function isCreditCardNumber(/* ccn */) {
-  throw new Error('Not implemented');
+function isCreditCardNumber(ccn) {
+  const ccnStr = String(ccn).replace(/\s/g, ''); // Преобразую число CCN в строку и удаляю все пробелы
+  const digits = Array.from(ccnStr, Number);
+
+  if (digits.length < 2) { // Если количество цифр меньше 2, CCN недействителен
+    return false;
+  }
+
+  let i = digits.length - 2; // Индекс предпоследней цифры
+  while (i >= 0) { // Обрабатываю каждую вторую цифру, начиная с предпоследней
+    digits[i] *= 2;// Удваиваю значение цифры
+    if (digits[i] > 9) {
+      digits[i] -= 9; // Если результат больше 9, вычитаю 9
+    }
+    i -= 2; // Переход к след. второй цифре
+  }
+
+  const sum = digits.reduce((acc, digit) => acc + digit, 0); // Суммирую все цифры
+
+  return sum % 10 === 0; // Если сумма кратна 10, то CNN действителен
 }
 
 /**
@@ -293,8 +316,12 @@ function isCreditCardNumber(/* ccn */) {
  *   10000 ( 1+0+0+0+0 = 1 ) => 1
  *   165536 (1+6+5+5+3+6 = 26,  2+6 = 8) => 8
  */
-function getDigitalRoot(/* num */) {
-  throw new Error('Not implemented');
+function getDigitalRoot(num) {
+  let number = num;
+  while (number > 9) {
+    number = number.toString().split('').reduce((sum, digit) => sum + parseInt(digit, 10), 0);
+  }
+  return number;
 }
 
 
@@ -319,10 +346,33 @@ function getDigitalRoot(/* num */) {
  *   '{)' = false
  *   '{[(<{[]}>)]}' = true
  */
-function isBracketsBalanced(/* str */) {
-  throw new Error('Not implemented');
-}
+function isBracketsBalanced(str) {
+  const brackets = {
+    '[': ']',
+    '{': '}',
+    '(': ')',
+    '<': '>',
+  };
 
+  const stack = [];
+
+  for (let i = 0; i < str.length; i += 1) {
+    const char = str[i];
+    // Если текущий символ - открывающеяся скобка, добавляю его в стек
+    if (brackets[char]) {
+      stack.push(char);
+    } else if (char === ']' || char === '}' || char === ')' || char === '>') {
+      // Если текущий символ - закрывающаяся скобка, проверяю соотв с последней открытой скобкой
+      const lastBracket = stack.pop();
+      if (char !== brackets[lastBracket]) {
+        // Если закрывающая скобка не соответствует последней открытой скобке - false
+        return false;
+      }
+    }
+  }
+
+  return stack.length === 0;
+}
 
 /**
  * Returns the string with n-ary (binary, ternary, etc, where n <= 10)
@@ -344,8 +394,21 @@ function isBracketsBalanced(/* str */) {
  *    365, 4  => '11231'
  *    365, 10 => '365'
  */
-function toNaryString(/* num, n */) {
-  throw new Error('Not implemented');
+function toNaryString(num, n) {
+  let number = num;
+  if (number === 0) {
+    return '0';
+  }
+
+  let result = '';
+
+  while (number > 0) {
+    const remainder = number % n;
+    result = remainder.toString() + result;
+    number = Math.floor(number / n);
+  }
+
+  return result;
 }
 
 
@@ -361,8 +424,24 @@ function toNaryString(/* num, n */) {
  *   ['/web/assets/style.css', '/.bin/mocha',  '/read.me'] => '/'
  *   ['/web/favicon.ico', '/web-scripts/dump', '/verbalizer/logs'] => '/'
  */
-function getCommonDirectoryPath(/* pathes */) {
-  throw new Error('Not implemented');
+function getCommonDirectoryPath(pathes) {
+  const parts = pathes.map((path) => path.split('/')); // Разделяю каждый путь на части
+
+  let commonPath = '';
+
+  for (let i = 0; i < parts[0].length; i += 1) { // Иду по частям первого пути
+    const currentPart = parts[0][i]; // Получаю текущую часть
+
+    if (parts.some((part) => part[i] !== currentPart)) {
+      // Проверяю, совпадает ли текущая часть и часть в других путях
+      // Если есть различие, прерываю цикл
+      break;
+    }
+
+    commonPath += `${currentPart}/`; // Добавляю текущую часть к общей директории
+  }
+
+  return commonPath;
 }
 
 
@@ -384,8 +463,34 @@ function getCommonDirectoryPath(/* pathes */) {
  *                         [ 6 ]]
  *
  */
-function getMatrixProduct(/* m1, m2 */) {
-  throw new Error('Not implemented');
+function getMatrixProduct(m1, m2) {
+  const rows1 = m1.length;
+  const cols1 = m1[0].length;
+  const cols2 = m2[0].length;
+
+  if (cols1 !== m2.length) {
+    throw new Error('Invalid matrix dimensions');
+    // количество столбцов первой матрицы (m1) равно количеству строк второй матрицы (m2).
+    // Если это условие не выполняется, то матрицы нельзя перемножить.
+  }
+
+  const result = []; // пустая матрица для результата
+
+  for (let i = 0; i < rows1; i += 1) {
+    result[i] = [];
+
+    for (let j = 0; j < cols2; j += 1) {
+      let sum = 0;
+
+      for (let k = 0; k < cols1; k += 1) {
+        sum += m1[i][k] * m2[k][j];
+      }
+      // k - индекс, кот меняется от 0 до кол-ва столбцов первой матрицы (или кол-во строк второй).
+      result[i][j] = sum; // зап сумму в тек элемент результата
+    }
+  }
+
+  return result;
 }
 
 
@@ -419,8 +524,35 @@ function getMatrixProduct(/* m1, m2 */) {
  *    [    ,   ,    ]]
  *
  */
-function evaluateTicTacToePosition(/* position */) {
-  throw new Error('Not implemented');
+function evaluateTicTacToePosition(position) {
+  const rows = position.length; // Получаю кол-во строк в позиции
+  const cols = position[0].length; // Получаю кол-во столбцов в позиции
+
+  for (let i = 0; i < rows; i += 1) { // Проверяю горизонтальные линии
+    if (position[i][0] && position[i][0] === position[i][1] && position[i][0] === position[i][2]) {
+      return position[i][0];
+      // Если все элементы в текущей горизонтальной линии равны, возвращаю победителя
+    }
+  }
+
+  // Проверяю вертикальные линии
+  for (let j = 0; j < cols; j += 1) {
+    if (position[0][j] && position[0][j] === position[1][j] && position[0][j] === position[2][j]) {
+      return position[0][j];
+      // Такая же история, как и с гориз. линиями
+    }
+  }
+
+  // Проверяю диагонали
+  if (position[0][0] && position[0][0] === position[1][1] && position[0][0] === position[2][2]) {
+    return position[0][0]; // Если все элементы на главной диагонали равны, возвращаю победителя
+  }
+
+  if (position[0][2] && position[0][2] === position[1][1] && position[0][2] === position[2][0]) {
+    return position[0][2]; // Если все элементы на побочной диагонали равны, возвращаю победителя
+  }
+
+  return undefined; // Если нет победителя, то undefined
 }
 
 
