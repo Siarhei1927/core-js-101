@@ -188,10 +188,11 @@ function isInsideCircle(circle, point) {
  *   'abracadabra'  => 'c'
  *   'entente' => null
  */
-function findFirstSingleChar(/* str */) {
-  throw new Error('Not implemented');
+function findFirstSingleChar(str) {
+  const charArray = Array.from(str);
+  const nonRepChars = charArray.filter((ch, index, arr) => arr.indexOf(ch) === arr.lastIndexOf(ch));
+  return nonRepChars.length > 0 ? nonRepChars[0] : null;
 }
-
 
 /**
  * Returns the string representation of math interval,
