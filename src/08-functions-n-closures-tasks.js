@@ -23,8 +23,8 @@
  *   getComposition(Math.sin, Math.asin)(x) => Math.sin(Math.asin(x))
  *
  */
-function getComposition(/* f, g */) {
-  throw new Error('Not implemented');
+function getComposition(f, g) {
+  return (x) => f(g(x));
 }
 
 
@@ -44,8 +44,8 @@ function getComposition(/* f, g */) {
  *   power05(16) => 4
  *
  */
-function getPowerFunction(/* exponent */) {
-  throw new Error('Not implemented');
+function getPowerFunction(exponent) {
+  return (x) => x ** exponent;
 }
 
 
@@ -81,9 +81,22 @@ function getPolynom() {
  *   ...
  *   memoizer() => the same random number  (next run, returns the previous cached result)
  */
-function memoize(/* func */) {
-  throw new Error('Not implemented');
-}
+const memoize = (func) => {
+  const cache = {};
+
+  return (...args) => { // функция будет запоминать результаты выполнения переданной функции
+    const key = JSON.stringify(args); // Преобразую аргументы в строку для уникального ключа в кэше
+
+    // Проверка есть ли результат выполнения функции в кэше
+    if (Object.prototype.hasOwnProperty.call(cache, key)) {
+      return cache[key];
+    }
+    // Если нет в кэше, то вызываю переданную функцию с переданными аргументами
+    const result = func(...args);
+    cache[key] = result;
+    return result;
+  };
+};
 
 
 /**
@@ -101,8 +114,18 @@ function memoize(/* func */) {
  * }, 2);
  * retryer() => 2
  */
-function retry(/* func, attempts */) {
-  throw new Error('Not implemented');
+function retry(func, attempts) {
+  return () => {
+    for (let i = 0; i < attempts; i += 1) {
+      try {
+        const result = func();
+        return result;
+      } catch (error) {
+        // В случае ошибки, перехожу к следующей попытке
+      }
+    }
+    throw new Error('All attempts are fail');
+  };
 }
 
 
@@ -129,8 +152,20 @@ function retry(/* func, attempts */) {
  * cos(3.141592653589793) ends
  *
  */
-function logger(/* func, logFunc */) {
-  throw new Error('Not implemented');
+function logger(func, logFunc) {
+  return (...args) => {
+    const argString = args.map((arg) => JSON.stringify(arg)).join(',');
+    /* функция принимает аргументы, переданные при вызове обернутой функции func.
+    Затем она формирует строку, в кот аргументы преобр в JSON-строки и объединяются с помощью , */
+
+    logFunc(`${func.name}(${argString}) starts`);
+    // записывает сообщения о начале вызова функции func, передавая имя функции и аргументы.
+    const result = func(...args);
+
+    logFunc(`${func.name}(${argString}) ends`);
+
+    return result;
+  };
 }
 
 
@@ -147,8 +182,8 @@ function logger(/* func, logFunc */) {
  *   partialUsingArguments(fn, 'a','b','c')('d') => 'abcd'
  *   partialUsingArguments(fn, 'a','b','c','d')() => 'abcd'
  */
-function partialUsingArguments(/* fn, ...args1 */) {
-  throw new Error('Not implemented');
+function partialUsingArguments(fn, ...args1) {
+  return (...args2) => fn(...args1, ...args2);
 }
 
 
@@ -169,8 +204,14 @@ function partialUsingArguments(/* fn, ...args1 */) {
  *   getId4() => 7
  *   getId10() => 11
  */
-function getIdGeneratorFunction(/* startFrom */) {
-  throw new Error('Not implemented');
+function getIdGeneratorFunction(startFrom) {
+  let id = startFrom;
+
+  return () => {
+    const currentId = id;
+    id += 1;
+    return currentId;
+  };
 }
 
 
